@@ -118,6 +118,16 @@ def get_formation(request):
                 else:
                     response_data["message"] = "sous categorie non trouver"
 
+            elif "id" in form:
+                formation_id = form.get("id")
+                all_formation = Formation.objects.all().filter(id=formation_id)
+                filter = True
+                # if formation:
+                #     all_formation = formation
+                #     filter = True
+                # else:
+                #     response_data["message"] = "formation non trouver"
+
             elif "instructeur_id" in form:
                 instructeur_id = form.get("instructeur_id")
                 instructeur = Utilisateur.objects.all().filter(id=instructeur_id).first()
@@ -443,6 +453,64 @@ def get_formation_detaille(request, slug):
         response_data["donnee"] = form_json
     else:
         response_data["message"] = "formation non trouver"
+
+    return HttpResponse(json.dumps(response_data), content_type="application/json")
+
+@csrf_exempt
+def get_formation_un(request):
+    response_data = {'message': "requette invalide", 'etat': False}
+
+    if request.method == "POST":
+        form = dict()
+        try:
+            form = json.loads(request.body.decode("utf-8"))
+        except:
+            ...
+
+        filtrer = False
+        if "id" in form:
+            formation_id = form.get("id")
+
+            formation = Formation.objects.all().filter(id=formation_id).first()
+            filtrer= True
+
+        if "slug" in form:
+            formation_slug = form.get("slug")
+
+            formation = Formation.objects.all().filter(slug=formation_slug).first()
+            filtrer = True
+
+        if filtrer:
+
+            form_json = {
+                "nom": formation.nom,
+                "miniature": formation.miniature.url if formation.miniature else None,
+                "prix": formation.prix,
+                "slug": formation.slug,
+                "sous_categorie_slug": formation.sous_categorie.slug,
+                "instructeur_id": formation.instructeur.id,
+                "nombre_heur": formation.nombre_heur_str,
+                "description": formation.description,
+                "prerequis": formation.prerequis,
+                "profile_destine": formation.profile_destine,
+                "objecti_du_cours": formation.objectif_du_cours,
+                "publier": formation.publier,
+                "moderer": formation.moderer,
+                "ajout_terminer": formation.ajout_terminer,
+
+                "date": str(formation.date),
+                "date_de_publication": str(
+                    formation.date_de_publication) if formation.date_de_publication else None,
+                "dernier_mise_a_jour": str(formation.dernier_mise_a_jour),
+
+                "nombre_apprenant": formation.nombre_apprenant,
+                "montant_achter": formation.montant_achter,
+            }
+
+            response_data["etat"] = True
+            response_data["message"] = "success"
+            response_data["donnee"] = form_json
+
 
     return HttpResponse(json.dumps(response_data), content_type="application/json")
 
@@ -1905,39 +1973,39 @@ def get_participer(request):
             form = json.loads(request.body.decode("utf-8"))
         except:
             ...
-        all_suive = Suive.objects.all()
+        all_participer = Participer.objects.all()
         filtrer = False
 
         if "apprenant_id" in form:
             apprenant_id = form.get("apprenant_id")
             apprenant = Utilisateur.objects.all().filter(id=apprenant_id).first()
             if apprenant:
-                all_suive = all_suive.filter(apprenant=apprenant)
+                all_participer = all_participer.filter(apprenant=apprenant)
                 filtrer = True
             else:
                 response_data["message"] = "apprenant non trouver"
 
-        if "souscategorie_id" in form:
-            souscategorie_id = form.get("souscategorie_id")
+        if "qcm_id" in form:
+            qcm_id = form.get("qcm_id")
 
-            souscategorie = SousCategorie.objects.all().filter(slug=souscategorie_id).first()
+            qcm = Qcm.objects.all().filter(slug=qcm_id).first()
 
-            if souscategorie:
-                all_suive = all_suive.filter(souscategorie=souscategorie)
+            if qcm:
+                all_participer = all_participer.filter(qcm=qcm)
                 filtrer = True
             else:
-                response_data["message"] = "souscategorie non trouver"
+                response_data["message"] = "qcm non trouver"
 
         if "terminer" in form:
             terminer = form.get("terminer")
 
-            all_suive = all_suive.filter(terminer=terminer)
+            all_participer = all_participer.filter(terminer=terminer)
             filtrer = True
 
         if filtrer:
             suives = list()
 
-            for c in all_suive:
+            for c in all_participer:
                 suives.append(
                     {
                         "id": c.id,
@@ -1982,6 +2050,7 @@ def participer_get_all(request):
                 "apprenant_nom": ex.apprenant.first_name,
                 "apprenant_prenom": ex.apprenant.last_name,
                 "qcm_id": ex.qcm.id,
+                "qcm_form": ex.qcm.formation_id,
                 "qcm_nom": ex.qcm.nom,
                 "date": str(ex.date)
             }
@@ -2468,6 +2537,8 @@ def get_seancetravail(request):
             form = json.loads(request.body.decode("utf-8"))
         except:
             ...
+
+        print(form)
 
         if "apprenant_id" in form and "formation_slug" in form:
 

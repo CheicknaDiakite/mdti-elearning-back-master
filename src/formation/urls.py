@@ -12,13 +12,14 @@ from .views import add_formation, add_categorie, del_categorie, get_categorie, s
     examen_add, add_video, examen_set, examen_del, examen_get_un, examen_get_all, examen_get, examen_resultat_add, \
     examen_resultat_del, examen_resultat_get, examen_resultat_all, examen_resultat_get_un, get_temoignages_sans_m, \
     add_suive, set_suive, get_suive, del_suive, add_participer, set_participer, get_participer, del_participer, \
-    participer_get_all
+    participer_get_all, get_formation_un
 
 urlpatterns = [
     path("add", add_formation, name="add_formation"),
     path("get", get_formation, name="get_formation"),
     path("get-all", get_all_formation, name="get_all_formation"),
     path("get/<str:slug>", get_formation_detaille, name="get_formation_detaille"),
+    path("un", get_formation_un, name="get_formation_un"),
     path("set", set_formation, name="set_formation"),
     path("del", del_formation, name="del_formation"),
 

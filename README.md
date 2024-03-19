@@ -118,6 +118,16 @@
 | suppression  | formation/suive/del | id                             |        |
 | modification | formation/suive/set | id                             |        |
 
+### Participer
+
+| Action            | url                          | paramètre            | retour |
+|-------------------|------------------------------|----------------------|--------|
+| ajouter           | formation/participer/add     | apprenat_id, qcm_id  |        |
+| recuperation tous | formation/participer/get-all |                      |        |
+| recuperation      | formation/participer/get     | apprenant_id, qcm_id |        |
+| suppression       | formation/participer/del     | id                   |        |
+| modification      | formation/participer/set     | id                   |        |
+
 
 ### Temoignages
 
